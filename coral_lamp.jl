@@ -1,6 +1,7 @@
 using LinearAlgebra
 using Plots
 using Distances
+using Luxor
 
 include("data.jl")
 include("util/spherical_geometry.jl")
@@ -9,10 +10,11 @@ include("types/floral.jl")
 
 v = get_vertices()
 
-diameter = 0.6
+diameter = 60cm
 radius = diameter / 2
 
-coral = Coral(v, radius)
+coral = Coral3d(v, radius)
+width = diameter / 30
 
 # ### TEST - compare pythagoras error on ball surface, i.e. these values should not be equal
 # # Curved lines
@@ -27,11 +29,5 @@ coral = Coral(v, radius)
 # @show p,q
 # ###
 
-@show sphere_angle(coral.tip,coral.center,coral.side_a) * 180 / pi
-@show sphere_angle(coral.side_b,coral.center,coral.side_a) * 180 / pi
-@show sphere_angle(coral.side_b,coral.center,coral.tip) * 180 / pi
-@show sphere_angle(coral.side_a,coral.center,coral.bottom_a) * 180 / pi
-@show sphere_angle(coral.bottom_a,coral.center,coral.bottom_b) * 180 / pi
-@show sphere_angle(coral.bottom_b,coral.center,coral.side_b) * 180 / pi
+@show angles(coral)
 
-sphere_surface_area = 4 * pi * radius^2
