@@ -54,13 +54,6 @@ end
 	#poly(offsetpoly(p, 30), :stroke, close=true)
 end
 
-# ╔═╡ e3e05400-838a-11eb-0df6-e5b3dcba879a
-
-mirror_y(p::Point)::Point = Point(-p.x, p.y)
-
-# ╔═╡ e7483c8e-838a-11eb-367a-fdaa9c61cde5
-mirror_x(p::Point)::Point = Point(p.x, -p.y)
-
 # ╔═╡ 6a92c0ba-85ce-11eb-0733-efc5f7ac0721
 function parallel_line(pt1, pt2, offset=0)
 	normal = perpendicular(pt2-pt1)
@@ -100,11 +93,16 @@ end
 	offset = width / 2
 	side_angle = deg2rad(60)
 	
+	bridge = 0.4mm * 1
+	bridge_a(r) = bridge / r
+	
 	r1 = 10
 	r2 = 5
-	corner_radius = [r1, r2, r2, r2, r1]
+	r_corner = [r1, r2, r2, r2, r1]
+	r_hole = 5
 	
 	sethue("black")
+	setline(2)
 	
 	skeleton = [
 		Point(0, -tip),
@@ -123,23 +121,32 @@ end
 	end
 	
 	for p in skeleton
-		circle(p, 5,  :stroke)
+		#circle(p, r_hole,  :stroke)
+		arc(p, r_hole, bridge_a(r_hole), 2pi - bridge_a(r_hole))
+		newsubpath()
 	end
 	
 	for (i, s1) in enumerate(skeleton)
+		if bridge > 0
+			newsubpath()
+		end
+		s2 = skeleton[i % length(skeleton) + 1]
 		@layer begin
 			rotate(slope(O, s1))
-			#circle(bottom, 0, 5)
-			arc(distance(O, s1), 0, offset, -pi/2, pi/2)
+			arc(distance(O, s1), 0, offset, bridge_a(offset), pi/2)
 		end
-		
-		s2 = skeleton[i % length(skeleton) + 1]
 		p1, corner, p2 = Luxor.offsetlinesegment(s1, O, s2, offset, offset)
-		carc2r(cornersmooth(p1, corner, p2, corner_radius[i])...)
+		carc2r(cornersmooth(p1, corner, p2, r_corner[i])...)
+		@layer begin
+			rotate(slope(O, s2))
+			arc(distance(O, s2), 0, offset, -pi/2, -bridge_a(offset))
+		end
 	end
-	
-	closepath()
+	if bridge == 0
+		closepath()
+	end
 	strokepath()
+	
 	finish()
 end
 
@@ -254,8 +261,6 @@ end=#
 # ╠═49d7de80-7a09-11eb-139c-6b17efed44a4
 # ╠═e750072c-7a0c-11eb-2b90-f5c10b7d1de2
 # ╠═2537384c-8386-11eb-283c-b98a0971c685
-# ╠═e3e05400-838a-11eb-0df6-e5b3dcba879a
-# ╠═e7483c8e-838a-11eb-367a-fdaa9c61cde5
 # ╠═e7e63e3e-838a-11eb-1a0c-39d2b41bef41
 # ╠═6a92c0ba-85ce-11eb-0733-efc5f7ac0721
 # ╠═0dc0cffa-85d1-11eb-108e-995b8b449c62
