@@ -1,6 +1,6 @@
 using AngleBetweenVectors
 using Luxor
-import Luxor.offsetlinesegment
+using Luxor: offsetlinesegment
 using IntegralArrays
 
 struct Coral3d
@@ -13,9 +13,11 @@ struct Coral3d
     radius
 end
 
-function Coral3d(data::NamedTuple, radius::Float64)
-    center = normalize((data.side_a + data.side_b) / 2)
-    Coral3d(data.tip, data.side_a, data.side_b, data.bottom_a, data.bottom_b, center, radius)
+function Coral3d(data::PolyhedraTile, radius::Float64)
+    points = [data.tip, data.side_a, data.side_b, data.bottom_a, data.bottom_b]
+    center = (data.side_a + data.side_b) / 2
+    push!(points, center)
+    Coral3d(normalize.(points)..., radius)
 end
 
 # angle at ball center between alle the tips of the shape and the star center
@@ -44,6 +46,7 @@ struct Coral2d
     rad_side_bottom
     rad_bottom
 end
+Coral2d(c::Coral3d) = Coral2d(arm_lengths(c)..., angles(c)...)
 
 function Base.show(io::IO, c::Coral2d)
     println("Coral2d:")
@@ -55,10 +58,8 @@ function Base.show(io::IO, c::Coral2d)
     println(io, rad2deg(c.rad_bottom))
 end
 
-unroll(c::Coral3d)::Coral2d = Coral2d(arm_lengths(c)..., angles(c)...)
-
 function generate_svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm)
-    d = Drawing(800, 800, "coral.svg")
+    d = Drawing("A4", "coral.svg")
     origin()
 
 	tip = c.length_tip
@@ -78,27 +79,20 @@ function generate_svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, 
 	r_corner = [r1, r2, r2, r2, r1]
 	
 	sethue("black")
-	setline(2)
+	setline(1)
 
     lengths = [tip, side, bottom, bottom, side]
     angles = IntegralArray([-pi/2, c.rad_tip_side, c.rad_side_bottom, c.rad_bottom, c.rad_side_bottom])
 	
-	# skeleton = [
-	# 	Point(0, -tip),
-	# 	Point(side, 0),
-	# 	polar(bottom, side_angle),
-	# 	polar(bottom, pi - side_angle),
-	# 	Point(-side, 0)
-	# ]
     skeleton = [polar(l, a) for (l, a) in zip(lengths, angles)]
 	
 	# draw skeleton
-	@layer begin
-		sethue("red")
-		for p in skeleton
-			line(O, p, :stroke)
-		end
-	end
+	# @layer begin
+	# 	sethue("red")
+	# 	for p in skeleton
+	# 		line(O, p, :stroke)
+	# 	end
+	# end
 	
 	for p in skeleton
 		#circle(p, r_hole,  :stroke)
@@ -131,103 +125,3 @@ function generate_svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, 
 
 end
 
-# @draw begin
-# 	d = Drawing(800,800, "coral_test.svg")
-# 	origin()
-# 	side = bottom = 100
-# 	tip = 2*side
-# 	width = 30
-# 	offset = width / 2
-# 	angle = 45 / 180 * pi
-	
-# 	corner_radius1 = 15
-# 	corner_radius2 = 5
-	
-# 	sethue("black")
-	
-# 	# draw skeletton
-# 	@layer begin
-# 		sethue("red")
-# 		line(O, Point(0, -tip), :stroke)
-# 		line(Point(side, 0), Point(-side, 0), :stroke)
-# 		move(O)
-# 		bottom_a = polar(bottom, angle)
-# 		line(O, bottom_a, :stroke)
-# 		bottom_b = polar(bottom, pi - angle)
-# 		line(O, bottom_b, :stroke)
-# 	end
-	
-	
-	
-# 	# Start new path
-# 	#newpath()
-# 	#line(O,O, :path)
-# 	p1 = Point(offset, -tip)
-# 	move(p1)
-	
-# 	c = p1 + Point(0, tip - offset)
-# 	#line(c)
-	
-# 	p2 = c + Point(side - offset, 0)
-# 	#line(p2)
-		
-# 	carc2r(cornersmooth(p1, c, p2, corner_radius1)...)
-	 
-# 	right_side = Point(side, 0)
-# 	arc(right_side, offset, -pi/2, pi/2)
-	
-# 	# compute intersection point between side and angle boundaries
-# 	side_outer = currentpoint()
-# 	side_inner = side_outer + Point(-side, 0)
-# 	right_bottom_center = polar(bottom, angle)
-# 	bottom_outer = perpendicular(right_bottom_center, O, offset)
-# 	bottom_inner = bottom_outer - right_bottom_center
-# 	flag, side_ip =  intersectionlines(side_outer, side_inner, bottom_inner, bottom_outer, crossingonly=true)
-# 	@assert flag
-	
-# 	_, center, _ = Luxor.offsetlinesegment(right_side, O, right_bottom_center, offset, offset)
-	
-# 	line(center)
-# 	line(bottom_outer)
-	
-# 	@layer begin
-# 		rotate(angle)
-# 		#circle(bottom, 0, 5)
-# 		arc(bottom, 0, offset, -pi/2, pi/2)
-# 	end
-	
-# 	right_outer = currentpoint()
-# 	right_inner = right_outer - right_bottom_center
-# 	flag, bottom_ip =  intersectionlines(right_outer, right_inner, O, Point(0, bottom), crossingonly=true)
-# 	@assert flag
-	
-# 	line(bottom_ip)
-# 	line(mirror_y(right_outer))
-# 	@layer begin
-# 		rotate(pi - angle)
-# 		arc(bottom, 0, offset, -pi/2, pi/2)
-# 	end
-	
-# 	line(mirror_y(side_ip))
-# 	line(mirror_y(side_outer))
-# 	arc(-side, 0, offset, pi/2, 3pi/2)
-# 	rline(side - offset, 0)
-# 	rline(0, -(tip-offset))
-# 	arc(0, -tip, offset, pi, 2pi)
-	
-# 	closepath()
-	
-	
-# 	#line(side_inner)
-# 	#line(bottom_inner, bottom_outer)
-	
-# 	strokepath()
-	
-# 	#circle(ip, 5)
-	
-		
-# 	strokepath()
-# 	#do_action(:stroke)
-# 	finish()
-# 	d
-# end

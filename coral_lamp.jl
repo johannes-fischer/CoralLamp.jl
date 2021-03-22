@@ -1,6 +1,5 @@
 using LinearAlgebra
 #using Plots
-using Distances
 using Luxor
 
 include("data.jl")
@@ -9,16 +8,15 @@ include("util/luxor_util.jl")
 include("types/coral.jl")
 include("types/floral.jl")
 
-v = get_vertices()
+t = get_tile()
 
 diameter = 60cm
 radius = diameter / 2
 
-coral = unroll(Coral3d(v, radius))
+coral = Coral2d(Coral3d(t, radius))
 width = diameter / 30
 hole_diameter = 5mm
 
-#print(coral)
+print(coral)
 
 generate_svg(coral, width, hole_diameter)
-
