@@ -154,106 +154,32 @@ end
 import Luxor.offsetlinesegment
 
 # ╔═╡ 405f061a-85d7-11eb-1249-e55633407b36
-#=@draw begin
-	d = Drawing(800,800, "coral_test.svg")
-	origin()
-	side = bottom = 100
-	tip = 2*side
-	width = 30
-	offset = width / 2
-	angle = 45 / 180 * pi
-	
-	corner_radius1 = 15
-	corner_radius2 = 5
-	
+@draw begin
+	c1 = (O, 150)
+	c2 = (O + (100, 0), 150)
+
+	circle(c1... , :stroke)
+	circle(c2... , :stroke)
+
+	sethue("purple")
+	circle(c1... , :clip)
+	circle(c2... , :fill)
+	clipreset()
+
 	sethue("black")
-	
-	# draw skeletton
-	@layer begin
-		sethue("red")
-		line(O, Point(0, -tip), :stroke)
-		line(Point(side, 0), Point(-side, 0), :stroke)
-		move(O)
-		bottom_a = polar(bottom, angle)
-		line(O, bottom_a, :stroke)
-		bottom_b = polar(bottom, pi - angle)
-		line(O, bottom_b, :stroke)
+
+	text(string(150^2 * π |> round), c1[1] - (125, 0))
+	text(string(150^2 * π |> round), c2[1] + (100, 0))
+	sethue("white")
+	text(string(intersection2circles(c1..., c2...) |> round),
+		 midpoint(c1[1], c2[1]), halign=:center)
+
+	sethue("red")
+	flag, C, D = intersectioncirclecircle(c1..., c2...)
+	if flag
+		circle.([C, D], 5, :fill)
 	end
-	
-	
-	
-	# Start new path
-	#newpath()
-	#line(O,O, :path)
-	p1 = Point(offset, -tip)
-	move(p1)
-	
-	c = p1 + Point(0, tip - offset)
-	#line(c)
-	
-	p2 = c + Point(side - offset, 0)
-	#line(p2)
-		
-	carc2r(cornersmooth(p1, c, p2, corner_radius1)...)
-	 
-	right_side = Point(side, 0)
-	arc(right_side, offset, -pi/2, pi/2)
-	
-	# compute intersection point between side and angle boundaries
-	side_outer = currentpoint()
-	side_inner = side_outer + Point(-side, 0)
-	right_bottom_center = polar(bottom, angle)
-	bottom_outer = perpendicular(right_bottom_center, O, offset)
-	bottom_inner = bottom_outer - right_bottom_center
-	flag, side_ip =  intersectionlines(side_outer, side_inner, bottom_inner, bottom_outer, crossingonly=true)
-	@assert flag
-	
-	_, center, _ = Luxor.offsetlinesegment(right_side, O, right_bottom_center, offset, offset)
-	
-	line(center)
-	line(bottom_outer)
-	
-	@layer begin
-		rotate(angle)
-		#circle(bottom, 0, 5)
-		arc(bottom, 0, offset, -pi/2, pi/2)
-	end
-	
-	right_outer = currentpoint()
-	right_inner = right_outer - right_bottom_center
-	flag, bottom_ip =  intersectionlines(right_outer, right_inner, O, Point(0, bottom), crossingonly=true)
-	@assert flag
-	
-	line(bottom_ip)
-	line(mirror_y(right_outer))
-	@layer begin
-		rotate(pi - angle)
-		arc(bottom, 0, offset, -pi/2, pi/2)
-	end
-	
-	line(mirror_y(side_ip))
-	line(mirror_y(side_outer))
-	arc(-side, 0, offset, pi/2, 3pi/2)
-	rline(side - offset, 0)
-	rline(0, -(tip-offset))
-	arc(0, -tip, offset, pi, 2pi)
-	
-	closepath()
-	
-	
-	#line(side_inner)
-	#line(bottom_inner, bottom_outer)
-	
-	strokepath()
-	
-	#circle(ip, 5)
-	
-		
-	strokepath()
-	#do_action(:stroke)
-	finish()
-	d
-end=#
+end
 
 # ╔═╡ Cell order:
 # ╠═24775210-7a09-11eb-34b3-9175ee4fd488
