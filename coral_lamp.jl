@@ -1,5 +1,3 @@
-using LinearAlgebra
-#using Plots
 using Luxor
 
 include("data.jl")
@@ -19,4 +17,4 @@ hole_diameter = 5mm
 
 print(coral)
 
-generate_svg(coral, width, hole_diameter)
+svg(coral, width, hole_diameter)

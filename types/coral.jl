@@ -21,7 +21,7 @@ function Coral3d(data::PolyhedraTile, radius::Float64)
 end
 
 # angle at ball center between alle the tips of the shape and the star center
-function angle_distances(c::Coral3d)
+function angledistances(c::Coral3d)
     angle_tip_center = angle(c.tip, c.center)
     angle_side_center = (angle(c.side_a, c.center) + angle(c.side_b, c.center)) / 2
     angle_bottom_center = (angle(c.bottom_a, c.center) + angle(c.bottom_b, c.center)) / 2
@@ -29,7 +29,7 @@ function angle_distances(c::Coral3d)
 end
 
 # great circle distances between tips and star center = length of the arms in the 2D projection
-arm_lengths(c::Coral3d) = c.radius * angle_distances(c)
+armlengths(c::Coral3d) = c.radius * angledistances(c)
 
 function angles(c::Coral3d)
     angle_tip_side = (sphere_angle(c.tip, c.center, c.side_a) + sphere_angle(c.tip, c.center, c.side_b)) / 2
@@ -46,7 +46,7 @@ struct Coral2d
     rad_side_bottom
     rad_bottom
 end
-Coral2d(c::Coral3d) = Coral2d(arm_lengths(c)..., angles(c)...)
+Coral2d(c::Coral3d) = Coral2d(armlengths(c)..., angles(c)...)
 
 function Base.show(io::IO, c::Coral2d)
     println("Coral2d:")
@@ -58,7 +58,7 @@ function Base.show(io::IO, c::Coral2d)
     println(io, rad2deg(c.rad_bottom))
 end
 
-function generate_svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm)
+function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm)
     d = Drawing("A4", "coral.svg")
     origin()
 
