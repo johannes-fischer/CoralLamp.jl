@@ -5,6 +5,8 @@ version = "0.1.0"
 
 [deps]
 AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 IntegralArrays = "1d092043-8f09-5a30-832f-7509e371ab51"
 IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"

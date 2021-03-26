@@ -12,6 +12,9 @@ using IntegralArrays
 using IterTools
 using Base.Iterators
 
+using CSV
+using DataFrames
+
 export 
     svg,
     Coral2d,
