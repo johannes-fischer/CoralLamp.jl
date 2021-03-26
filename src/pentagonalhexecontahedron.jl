@@ -1,8 +1,3 @@
-using LinearAlgebra
-using Distances
-
-using IterTools
-using Base.Iterators
 
 struct PolyhedraTile
     tip

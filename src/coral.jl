@@ -1,8 +1,3 @@
-using AngleBetweenVectors
-using Luxor
-using Luxor: offsetlinesegment
-using IntegralArrays
-
 struct Coral3d
     tip
     side_a

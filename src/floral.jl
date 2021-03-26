@@ -1,9 +1,3 @@
-using AngleBetweenVectors
-using Luxor
-using Rotations
-# using Luxor: offsetlinesegment
-# using IntegralArrays
-
 struct Floral3d
     tip
     side_a
@@ -24,6 +18,8 @@ function Floral3d(data::PolyhedraTile, radius::Float64, stem_factor::Float64=1.0
     push!(points, center)
     Floral3d(normalize.(points)..., radius)
 end
+
+struct Floral2d end
 
 
     # For corner circles in floral

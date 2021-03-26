@@ -1,10 +1,6 @@
 using Luxor
+using CoralLamp
 
-include("data.jl")
-include("util/spherical_geometry.jl")
-include("util/luxor_util.jl")
-include("types/coral.jl")
-include("types/floral.jl")
 
 t = get_tile()
 

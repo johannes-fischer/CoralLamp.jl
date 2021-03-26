@@ -1,7 +1,3 @@
-using AngleBetweenVectors
-using StaticArrays
-using LinearAlgebra
-
 function sphere_angle(a,b,c,center=[0.0,0.0,0.0])
     # Compute spherical angle at b between arc AB and BC, relative to center
     n1 = cross(b - center, a - center)

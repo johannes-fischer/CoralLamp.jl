@@ -1,6 +1,3 @@
-using Luxor
-import Luxor.offsetlinesegment
-
 function cornersmooth(pt1, pt2, pt3, corner_radius)
 	_, center, _ = offsetlinesegment(pt1, pt2, pt3, corner_radius, corner_radius)
 	p1 = getnearestpointonline(pt1, pt2, center)
