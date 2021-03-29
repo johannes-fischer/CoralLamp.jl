@@ -63,8 +63,6 @@ function project(c::SphereCircle, tangent::Plane)
     # A sphere circle is projected as an ellipse 
     # to the tangent plane in one of the circle's points A
     # The projected ellipse has a co-vertex at the point A
-    # The radius of curvature at the co-vertices of an ellipse is given by a^2/b
-    # https://en.wikipedia.org/wiki/Ellipse#Curvature
     proj = projectonto(c.center, tangent)
     Ellipse(c.r, norm(proj - tangent.distance * tangent.normal))
 end

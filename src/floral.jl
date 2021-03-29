@@ -44,6 +44,8 @@ function Floral2d(f::Floral3d)
     e = project(circle, tangent_plane)
     # The radius of curvature at the co-vertices of an ellipse is given by a^2/b
     # https://en.wikipedia.org/wiki/Ellipse#Curvature
+    # This should give the correct unrolled radius, since locally the sphere circle
+    # looks like an ellipse projection (?)
     r = e.a^2 / e.b
 
     # compute arc length of circle as length of small circle segment
