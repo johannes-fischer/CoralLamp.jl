@@ -19,7 +19,39 @@ function Floral3d(data::PolyhedraTile, radius::Float64, stem_factor::Float64=1.0
     Floral3d(normalize.(points)..., radius)
 end
 
-struct Floral2d end
+struct Floral2d 
+    stem::Float64
+    outerright::CircleSegment
+    innerright::CircleSegment
+    innerleft::CircleSegment
+    outerleft::CircleSegment
+end
+function Floral2d(f::Floral3d)
+    # tangent in center through tip is tangent to all circular arcs 
+    # Circular arcs can be determined by intersecting the sphere with a plane
+    # The tangent has to be in this plane ue to symmetry of small circles on a sphere
+    sphere = Sphere(f.radius)
+    tangent = tangent(sphere, f.center, f.tip)
+    tangent_plane = tangentplane(sphere, f.center)
+
+    # Compute the projected radius of the circle on the sphere
+    # All circles meet in the floral center, at which the tangent plane is
+    # The floral center forms a co-vertex of the projected ellipse
+
+    # for each side, bottom
+    circle_plane = Plane(f.center, f.center + tangent.dir, f.side_a)
+    circle = intersection(sphere, circle_plane)
+    e = project(circle, tangent_plane)
+    # The radius of curvature at the co-vertices of an ellipse is given by a^2/b
+    # https://en.wikipedia.org/wiki/Ellipse#Curvature
+    r = e.a^2 / e.b
+
+    # compute arc length of circle as length of small circle segment
+    # compute circle centers
+
+    
+
+end
 
 
     # For corner circles in floral
