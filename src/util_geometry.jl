@@ -67,13 +67,7 @@ function project(c::SphereCircle, tangent::Plane)
     Ellipse(c.r, norm(proj - tangent.distance * tangent.normal))
 end
 
-struct Circle2d 
-    x::Float64 # center coordinates
-    y::Float64
-    r::Float64
-end
-
 struct CircleSegment
-    circle::Circle2d
+    r::Float64 # signed radius (sign determines clockwise or counterclockwise)
     rad::Float64 # segment angle in radians
 end

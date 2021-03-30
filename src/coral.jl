@@ -12,7 +12,7 @@ function Coral3d(data::PolyhedraTile, radius::Float64)
     points = [data.tip, data.side_a, data.side_b, data.bottom_a, data.bottom_b]
     center = (data.side_a + data.side_b) / 2
     push!(points, center)
-    Coral3d(normalize.(points)..., radius)
+    Coral3d(radius*normalize.(points)..., radius)
 end
 
 # angle at ball center between alle the tips of the shape and the star center
