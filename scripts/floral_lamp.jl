@@ -13,4 +13,4 @@ hole_diameter = 5mm
 
 print(floral)
 
-# svg(floral, width, hole_diameter)
+svg(floral, width, hole_diameter)

@@ -73,7 +73,36 @@ function Floral2d(f::Floral3d)
 end
 
 
+function svg(f::Floral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm)
+    d = Drawing("A4", "floral.svg")
+    origin()
+	# translate(0, -200)
+	stem = f.stem
+    segments = [f.outerright, f.innerright, f.innerleft, f.outerleft]
+	arc_r = [arc.r for arc in segments]
+	arc_a = [arc.rad for arc in segments]
+	
+	# draw skeleton
+	@layer begin
+		sethue("red")
+		line(O, Point(0, -stem), :stroke)
+		for (radius, α) in zip(arc_r, arc_a)
+			if sign(radius) < 0
+				arc(radius, 0., abs(radius), 0, α, :stroke)
+			else
+				carc(radius, 0., abs(radius), pi, pi - α, :stroke)
+			end
+		end
+	end
+    # COMPUTE END POINTS AND USE THEM TO DRAW ARCS!
+    # necessary to draw holes
+
     # For corner circles in floral
     # https://juliagraphics.github.io/Luxor.jl/stable/simplegraphics/#Circles-and-tangents
     # line intersections https://juliagraphics.github.io/Luxor.jl/stable/geometrytools/#Intersections
     
+	# strokepath()
+	
+    finish()
+
+end
