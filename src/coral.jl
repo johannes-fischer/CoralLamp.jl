@@ -53,7 +53,7 @@ function Base.show(io::IO, c::Coral2d)
     println(io, rad2deg(c.rad_bottom))
 end
 
-function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm)
+function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm; test_holes=false)
     d = Drawing("A4", "coral.svg")
     origin()
 
@@ -94,7 +94,7 @@ function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1m
 		arc(p, r_hole, bridge_a(r_hole), 2pi - bridge_a(r_hole))
 		newsubpath()
 	end
-	
+
 	for (i, s1) in enumerate(skeleton)
 		if bridge > 0
 			newsubpath()
@@ -116,7 +116,29 @@ function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1m
 	end
 	strokepath()
 	
+    if test_holes
+        test_y = 15mm
+        diameters = (4.0:0.1:6)mm
+        split = 12
+        space = 10mm
+        x_diameters =  diameters[begin:split]
+        y_diameters =  diameters[split+1:end]
+        test_x = -side + 2space
+        for test_d in x_diameters
+            test_r = test_d / 2
+            newpath()
+            arc(Point(test_x, 0.), test_r, bridge_a(test_r), 2pi, :stroke)
+            test_x += space
+        end
+        test_y = -2space
+        for test_d in y_diameters
+            test_r = test_d / 2
+            newpath()
+            arc(Point(0., test_y), test_r, 3bridge_a(test_r), 2pi, :stroke)
+            test_y -= space
+        end
+    end
+	
     finish()
-
 end
 

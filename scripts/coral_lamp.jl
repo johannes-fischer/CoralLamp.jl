@@ -13,4 +13,4 @@ hole_diameter = 5mm
 
 print(coral)
 
-svg(coral, width, hole_diameter)
+svg(coral, width, hole_diameter, test_holes=true)
