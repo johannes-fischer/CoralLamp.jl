@@ -114,8 +114,27 @@ import Luxor.offsetlinesegment
 end
 
 # ╔═╡ bac005ea-8ce0-11eb-002b-0f61fcba8355
-5/2
-
+@draw begin
+	Drawing(2000,1000, "floral_test.svg")
+	origin()
+	translate(0, -200)
+	stem = 2cm
+	arc_r = [276., 1036, -1036, -276]
+	arc_a = [1.4, 0.48, 0.48, 1.4]
+	
+	# draw skeleton
+	@layer begin
+		sethue("red")
+		line(O, Point(0, -stem), :stroke)
+		for (radius, α) in zip(arc_r, arc_a)
+			if sign(radius) < 0
+				arc(radius, 0., abs(radius), 0, α, :stroke)
+			else
+				carc(radius, 0., abs(radius), pi, pi - α, :stroke)
+			end
+		end
+	end
+end
 
 # ╔═╡ Cell order:
 # ╠═24775210-7a09-11eb-34b3-9175ee4fd488
