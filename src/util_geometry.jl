@@ -29,6 +29,7 @@ tangentplane(s::Sphere, p::SVector{3})::Plane = Plane(p, s.R)
 struct Line3d
     p::SVector{3}
     dir::SVector{3}
+    Line3d(p, d) = new(p, normalize(d))
 end
 function tangent(s::Sphere, p::SVector{3}, q::SVector{3})::Line3d
     @assert norm(p) ≈ s.R
@@ -36,6 +37,7 @@ function tangent(s::Sphere, p::SVector{3}, q::SVector{3})::Line3d
     direction = projectonto(q, plane) - p
     Line3d(p, direction)
 end
+projectonto(vector::SVector{3}, l::Line3d) = l.p + dot(vector - l.p, l.dir) * l.dir
 
 """
     Circle with radius r on a sphere with radius R. Sphere center is the origin, circle center is given by center
@@ -68,6 +70,10 @@ function project(c::SphereCircle, tangent::Plane)
 end
 
 struct CircleSegment
-    r::Float64 # signed radius (sign determines clockwise or counterclockwise)
+    orientation::Real
+    r::Float64
+    # r::Float64 # signed radius (sign determines clockwise or counterclockwise)
     rad::Float64 # segment angle in radians
+    CircleSegment(o, r, rad) = (@assert r >= 0; new(o, r, rad))
 end
+# CircleSegment(r::Float64, rad::Float64) = CircleSegment(sign(r), abs(r), rad)
