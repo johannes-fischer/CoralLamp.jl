@@ -51,13 +51,9 @@ function Floral2d(f::Floral3d)
         # This should give the correct unrolled radius, since locally the sphere circle
         # looks like an ellipse projection (?)
         r = e.a^2 / e.b
-        @show circle.r
-        @show "Ellipse", r
-        approx_unroll(circle, f.center, tangent_plane, tangent_line)
 
         L = circle.r * angle(f.center - circle.center, pt - circle.center) # length of circular arc
         α = L / r # arc length of unrolled circular arc
-        # @show L
 
         # compute tangent plane spanning vector orthogonal to tangent vector
         # determine sign of projection of pt onto this vector 
@@ -72,30 +68,6 @@ function Floral2d(f::Floral3d)
         arcs[[2, 3]] = arcs[[3, 2]]
     end
     Floral2d(stem, arcs...)
-end
-
-function approx_unroll(c::SphereCircle, pt::SVector{3}, tangent::Plane, tangent_line::Line3d)
-    @assert tangent.distance * tangent.normal ≈ pt
-    @assert tangent.distance ≈ c.R
-    # choose coordinate system in plane of circle:
-    v1 = c.r*normalize(pt - c.center)
-    v2 = c.r*normalize(cross(c.center, v1))
-    for a = 0:15
-        α = 2.0^-a
-        q = c.center + cos(α)v1 + sin(α)v2
-        r = approx_unroll(pt, q, tangent_line)
-        @show r
-        r = approx_unroll(pt, projectonto(q, tangent), tangent_line)
-        @show a, α, r
-    end
-end
-
-function approx_unroll(p::SVector{3}, q::SVector{3}, tangent_line::Line3d)
-    l = norm(p - q)
-    proj = projectonto(q, tangent_line)
-    y = norm(p - proj)
-    α = acos(y/l)
-    r = y / sin(2α)
 end
 
 
