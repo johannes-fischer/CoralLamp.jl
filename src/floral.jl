@@ -21,10 +21,10 @@ end
 
 struct Floral2d 
     stem::Float64
-    outerright::CircleSegment
-    innerright::CircleSegment
-    innerleft::CircleSegment
-    outerleft::CircleSegment
+    outer_r::Float64
+    outer_rad::Float64
+    inner_r::Float64
+    inner_rad::Float64
 end
 function Floral2d(f::Floral3d)
     stem = f.radius * angle(f.tip, f.center)
@@ -39,9 +39,8 @@ function Floral2d(f::Floral3d)
     # Compute the projected radius of the circle on the sphere
     # All circles meet in the floral center, at which the tangent plane is located
     # The floral center forms a co-vertex of the projected ellipse
-
     arcs = []
-    for pt in [f.side_a, f.bottom_a, f.bottom_b, f.side_b]
+    for pt in [f.side_a, f.side_b, f.bottom_a, f.bottom_b]
         circle_plane = Plane(f.center, f.center + tangent_line.dir, pt)
         circle = intersection(sphere, circle_plane)
         println(circle)
@@ -58,16 +57,19 @@ function Floral2d(f::Floral3d)
         # compute tangent plane spanning vector orthogonal to tangent vector
         # determine sign of projection of pt onto this vector 
         # (should be positive on side a and negative on side b or vice versa) 
-        sgn = sign(dot(pt, cross(tangent_line.dir, tangent_plane.normal)))
-        push!(arcs, CircleSegment(sgn, r, α))
+        # sgn = sign(dot(pt, cross(tangent_line.dir, tangent_plane.normal)))
+        push!(arcs, [r, α])
     end
     # if necessary, switch left and right arcs
-    if arcs[1].orientation > 0
-        @assert arcs[2].orientation > 0 && arcs[3].orientation < 0 && arcs[4].orientation < 0
-        arcs[[1, 4]] = arcs[[4, 1]]
-        arcs[[2, 3]] = arcs[[3, 2]]
-    end
-    Floral2d(stem, arcs...)
+    # if arcs[1].orientation > 0
+    #     @assert arcs[2].orientation > 0 && arcs[3].orientation < 0 && arcs[4].orientation < 0
+    #     arcs[[1, 4]] = arcs[[4, 1]]
+    #     arcs[[2, 3]] = arcs[[3, 2]]
+    # end
+    reshape!(arcs, (4, 2))
+    outer = mean(arcs[1:2], axis=1)
+    inner = mean(arcs[3:4], axis=1)
+    Floral2d(stem, outer..., inner...)
 end
 
 
@@ -78,6 +80,7 @@ function svg(f::Floral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1
 	# translate(0, -200)
 	stem = f.stem
     segments = [f.outerright, f.innerright, f.innerleft, f.outerleft]
+	offset = width / 2
 	
 	# draw skeleton
 	@layer begin
@@ -95,6 +98,12 @@ function svg(f::Floral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1
 	end
     # COMPUTE END POINTS AND USE THEM TO DRAW ARCS!
     # necessary to draw holes
+
+	sethue("black")
+	setline(1)
+
+
+    
 
     # For corner circles in floral
     # https://juliagraphics.github.io/Luxor.jl/stable/simplegraphics/#Circles-and-tangents

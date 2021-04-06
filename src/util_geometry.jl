@@ -69,11 +69,10 @@ function project(c::SphereCircle, tangent::Plane)
     Ellipse(c.r, norm(proj - tangent.distance * tangent.normal))
 end
 
-struct CircleSegment
-    orientation::Real
-    r::Float64
-    # r::Float64 # signed radius (sign determines clockwise or counterclockwise)
-    rad::Float64 # segment angle in radians
-    CircleSegment(o, r, rad) = (@assert r >= 0; new(o, r, rad))
-end
-# CircleSegment(r::Float64, rad::Float64) = CircleSegment(sign(r), abs(r), rad)
+# struct CircleSegment
+#     r::Float64
+#     # r::Float64 # signed radius (sign determines clockwise or counterclockwise)
+#     rad::Float64 # segment angle in radians
+#     CircleSegment(r, rad) = (@assert r >= 0; new(r, rad))
+# end
+# # CircleSegment(r::Float64, rad::Float64) = CircleSegment(sign(r), abs(r), rad)
