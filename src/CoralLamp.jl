@@ -14,6 +14,7 @@ using Base.Iterators
 
 using CSV
 using DataFrames
+using Statistics
 
 export 
     svg,
@@ -21,7 +22,8 @@ export
     Coral3d,
     Floral2d,
     Floral3d,
-    get_tile
+    get_tile,
+    angle
 
 include("pentagonalhexecontahedron.jl")
 include("util_geometry.jl")

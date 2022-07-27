@@ -5,5 +5,5 @@ function cornersmooth(pt1, pt2, pt3, corner_radius)
 	return center, p1, p2
 end
 
-slope(p::Point) = Luxor.slope(O, p)
+Luxor.slope(p::Point) = slope(O, p)
 Base.angle(p::Point) = slope(p)

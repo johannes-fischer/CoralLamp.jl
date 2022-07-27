@@ -56,23 +56,19 @@ function Floral2d(f::Floral3d)
 
         # compute tangent plane spanning vector orthogonal to tangent vector
         # determine sign of projection of pt onto this vector 
-        # (should be positive on side a and negative on side b or vice versa) 
+        # (should be positive on side a and negative on side b or vice versa)
+        # NOW UNUSED 
         # sgn = sign(dot(pt, cross(tangent_line.dir, tangent_plane.normal)))
         push!(arcs, [r, α])
     end
-    # if necessary, switch left and right arcs
-    # if arcs[1].orientation > 0
-    #     @assert arcs[2].orientation > 0 && arcs[3].orientation < 0 && arcs[4].orientation < 0
-    #     arcs[[1, 4]] = arcs[[4, 1]]
-    #     arcs[[2, 3]] = arcs[[3, 2]]
-    # end
-    reshape!(arcs, (4, 2))
-    outer = mean(arcs[1:2], axis=1)
-    inner = mean(arcs[3:4], axis=1)
+    outer = mean(arcs[1:2])
+    inner = mean(arcs[3:4])
     Floral2d(stem, outer..., inner...)
 end
 
 
+## Todos: integrate floral drawing from prototype to real script
+## make use of new floral2d structure
 
 function svg(f::Floral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1mm)
     Drawing("A4", "floral.svg")
@@ -113,3 +109,4 @@ function svg(f::Floral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1
 	
     finish()
 end
+
