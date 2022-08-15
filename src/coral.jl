@@ -60,11 +60,11 @@ function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1m
 	tip = c.length_tip
 	side = c.length_side
     bottom = c.length_bottom
-	offset = width / 2
+	cap_radius = width / 2
 
 	r_hole = hole_diameter / 2
 	bridge_a(r) = 0.5bridge / r
-	
+
     if isnothing(r1)
         r1 = side / 10 * 0.95
     end
@@ -72,15 +72,15 @@ function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1m
         r2 = r1 / 2 * 0.95
     end
 	r_corner = [r1, r2, r2, r2, r1]
-	
+
 	sethue("black")
 	setline(1)
 
     lengths = [tip, side, bottom, bottom, side]
     angles = IntegralArray([-pi/2, c.rad_tip_side, c.rad_side_bottom, c.rad_bottom, c.rad_side_bottom])
-	
+
     skeleton = [polar(l, a) for (l, a) in zip(lengths, angles)]
-	
+
 	# draw skeleton
 	# @layer begin
 	# 	sethue("red")
@@ -88,7 +88,7 @@ function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1m
 	# 		line(O, p, :stroke)
 	# 	end
 	# end
-	
+
 	for p in skeleton
 		#circle(p, r_hole,  :stroke)
 		arc(p, r_hole, bridge_a(r_hole), 2pi - bridge_a(r_hole))
@@ -102,43 +102,34 @@ function svg(c::Coral2d, width, hole_diameter, r1=nothing, r2=nothing, bridge=1m
 		s2 = skeleton[i % length(skeleton) + 1]
 		@layer begin
 			rotate(slope(O, s1))
-			arc(distance(O, s1), 0, offset, bridge_a(offset), pi/2)
+			arc(distance(O, s1), 0, cap_radius, bridge_a(cap_radius), pi/2)
 		end
-		p1, corner, p2 = Luxor.offsetlinesegment(s1, O, s2, offset, offset)
+		p1, corner, p2 = Luxor.offsetlinesegment(s1, O, s2, cap_radius, cap_radius)
 		carc2r(cornersmooth(p1, corner, p2, r_corner[i])...)
 		@layer begin
 			rotate(slope(O, s2))
-			arc(distance(O, s2), 0, offset, -pi/2, -bridge_a(offset))
+			arc(distance(O, s2), 0, cap_radius, -pi/2, -bridge_a(cap_radius))
 		end
 	end
 	if bridge == 0
 		closepath()
 	end
 	strokepath()
-	
+
     if test_holes
-        test_y = 15mm
-        diameters = (4.0:0.1:6)mm
-        split = 12
         space = 10mm
-        x_diameters =  diameters[begin:split]
-        y_diameters =  diameters[split+1:end]
-        test_x = -side + 2space
-        for test_d in x_diameters
-            test_r = test_d / 2
+        diameter = 4.0mm
+        n_rows = 4
+        n_cols = 5
+        for j in 1:n_rows, i in 1:n_cols
+            p = Point(-side + i * space, - (j + 1) * space)
+            radius = diameter / 2
             newpath()
-            arc(Point(test_x, 0.), test_r, bridge_a(test_r), 2pi, :stroke)
-            test_x += space
-        end
-        test_y = -2space
-        for test_d in y_diameters
-            test_r = test_d / 2
-            newpath()
-            arc(Point(0., test_y), test_r, 3bridge_a(test_r), 2pi, :stroke)
-            test_y -= space
+            arc(p, radius, i / 2 * bridge_a(radius), 2pi, :stroke)
+            diameter += 0.1mm
         end
     end
-	
+
     finish()
 end
 
