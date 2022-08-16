@@ -4,8 +4,21 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
+
 # ╔═╡ 24775210-7a09-11eb-34b3-9175ee4fd488
 using Luxor, PlutoUI, Colors
+
+# ╔═╡ d28a3f9b-161a-46f5-854e-f6add2abd912
+md"""# Coral"""
 
 # ╔═╡ 0dc0cffa-85d1-11eb-108e-995b8b449c62
 function cornersmooth(pt1::Point, pt2::Point, pt3::Point, corner_radius)
@@ -18,13 +31,8 @@ end
 # ╔═╡ 3832a56e-85d7-11eb-0e36-5d035ae3e079
 import Luxor.offsetlinesegment
 
-# ╔═╡ c8e66ff0-94be-11eb-19d1-c3e0fd1ad8fe
-struct ArcSegment
-	center::Point
-	r::Real
-	start::Real
-	finish::Real
-end
+# ╔═╡ 46a2e722-1192-4051-8e5b-ce5e26341fdf
+md"""# Floral"""
 
 # ╔═╡ ecb10dc6-1312-4d1a-afb3-55aad56aba67
 struct FloralLeaf
@@ -39,7 +47,7 @@ Luxor.slope(f::FloralLeaf) = slope(f.center, f.leaf)
 Luxor.distance(f::FloralLeaf) = distance(f.center, f.leaf)
 
 # ╔═╡ 90981576-c4bb-49db-9ca2-885b2be3f8e8
-function cornersmooth(f1, f2, offset)
+function cornersmooth(f1::FloralLeaf, f2::FloralLeaf, offset)
 	if distance(f1) ≈ distance(f2)
 		sgn = 1, 1
 	elseif distance(f1) < distance(f2)
@@ -73,7 +81,7 @@ end
 sgnarc2r(sgn) = sgn > 0 ? arc2r : carc2r
 
 # ╔═╡ 797d0a46-edb8-43b0-a42d-c5662266b0af
-function cornersmooth(f1, f2, offset, sgn1, sgn2)
+function cornersmooth(f1::FloralLeaf, f2::FloralLeaf, offset, sgn1, sgn2)
 	flag, p, q = intersectioncirclecircle(f1.center, distance(f1) + sgn1*offset, f2.center, distance(f2) + sgn2*offset)
 	@assert flag
 	if p.y < 0
@@ -241,14 +249,142 @@ function draw_floral()
 		closepath()
 	end
 	strokepath()
+	    circle(start, 3,:fill)
+
 end
 
 # ╔═╡ bac005ea-8ce0-11eb-002b-0f61fcba8355
 @draw begin
-	Drawing(2000,1000, "floral_test.svg")
+	Drawing(600,650, "floral_test.svg")
 	origin()
 	translate(0, -200)
 	draw_floral()
+end
+
+# ╔═╡ 9260ce2e-e6ca-43e9-81ed-97c9ed81362d
+md"""## Floral head piece"""
+
+# ╔═╡ a34a9fd9-d2fc-4f49-a206-8ff528149b54
+begin
+	stem = 2cm
+	width = 1.5cm
+	halfwidth = width / 2
+end
+
+# ╔═╡ 52a08dfc-dff1-4d21-82ce-cbd3363202de
+begin
+	md"""
+	R $(@bind R Slider(0:3halfwidth, default=2halfwidth))
+	
+	α $(@bind α Slider(0.2:0.01:0.5, default=0.35))
+	
+	l $(@bind l Slider(halfwidth:0.01:stem, default=stem))
+	"""
+end
+
+# ╔═╡ 1a012336-20be-4be5-8952-b5ada343be48
+R, α, l
+
+# ╔═╡ 5abfee99-14a9-49aa-82b1-6bacda8932b2
+function head_piece_smoothing_points(tip_pt::Point, α_head, l_head, r, R)
+    # Distances of Bezier handles in curve direction to intersect
+    h1 = R / tan(α_head) - r / sin(α_head)
+    h2 = l_head - R / sin(α_head) + r / tan(α_head)
+
+    mirror_x(p::Point) = Point(-p.x, p.y)
+
+    q1 = tip_pt + polar(R, α_head)
+    q2 = q1 + polar(h1, α_head + pi / 2)
+    q4 = tip_pt + Point(r, l_head)
+    q3 = q4 + h2 * Point(0, -1)
+    right_pts = [q1, q2, q3, q4]
+    left_pts = mirror_x.(right_pts)
+    right_pts, left_pts
+end
+
+# ╔═╡ 71a7e160-f4e3-466f-8870-efc01b442482
+function draw_floral_head()
+	
+	
+	
+	tip = Point(0, -stem)
+	
+	outer_r = 276.
+	inner_r = 1036.
+	outer_rad = 1.4
+	inner_rad = 0.48
+	
+	bridge = 0.4mm * 1
+	bridge_a(r) = bridge / r
+	r_hole = 5.5mm / 2
+	
+	r1 = halfwidth / 2.5
+	r2 = r1
+	
+	##### start
+	
+	segments = [
+		(Point(outer_r, 0), polar(outer_r, pi - outer_rad)),
+		(Point(inner_r, 0), polar(inner_r, pi - inner_rad)),
+		(Point(-inner_r, 0), polar(inner_r, inner_rad)),
+		(Point(-outer_r, 0), polar(outer_r, outer_rad)),
+	]
+	segments = [FloralLeaf(c, c+p) for (c, p) in segments]
+	
+	holes = [f.leaf for f in segments]
+	push!(holes, tip)
+	for p in holes[[1,4,5]]
+		circle(p, r_hole,  :stroke)
+	end
+	
+	f1, f2, f3, f4 = segments
+
+    right_pts, left_pts = head_piece_smoothing_points(
+		tip, α, l, halfwidth, R)
+    
+	
+	# RIGHT HALF OF STEM
+	arc(tip, R, -pi/2 + bridge_a(R), α)
+
+	curve(right_pts[2:4]...)
+
+	
+	start = halfwidth / distance(f1) * f1.center
+	carc2r(f1.center, start, f1.leaf)
+	
+    # OUTER RIGHT TIP
+    drawsegmentcap(f1, halfwidth, bridge_a(halfwidth))
+    # OUTER LEFT TIP
+    drawsegmentcap(f4, halfwidth, bridge_a(halfwidth))
+
+	carc2r(f4.center, currentpoint(), O)
+
+	
+            p1, p2, p3, p4 = left_pts
+            line(p4)
+            curve(p3, p2, p1)
+	
+	# LEFT HALF OF STEM
+	arc(tip, R, -pi-α, -pi/2 - bridge_a(R))
+	
+	if bridge == 0
+		closepath()
+	end
+	strokepath()
+	
+	# circle(start, 3,:fill)
+	for p in right_pts
+		# circle(p, 2, :fill)
+	end
+
+end
+
+# ╔═╡ d18897f6-1766-40c0-a78f-335eb38119e0
+@draw begin
+	Drawing(600,450, "floral_test.svg")
+	origin()
+	translate(0, -100)
+	draw_floral_head()
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -846,14 +982,15 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
+# ╠═d28a3f9b-161a-46f5-854e-f6add2abd912
 # ╠═24775210-7a09-11eb-34b3-9175ee4fd488
 # ╠═2537384c-8386-11eb-283c-b98a0971c685
 # ╠═a9d5b5b2-7375-4a5e-a55d-e42a13d6a6cf
 # ╠═0dc0cffa-85d1-11eb-108e-995b8b449c62
 # ╠═3832a56e-85d7-11eb-0e36-5d035ae3e079
+# ╟─46a2e722-1192-4051-8e5b-ce5e26341fdf
 # ╠═bac005ea-8ce0-11eb-002b-0f61fcba8355
 # ╠═41aa7243-778d-48b4-918c-56f2075bd620
-# ╠═c8e66ff0-94be-11eb-19d1-c3e0fd1ad8fe
 # ╠═ecb10dc6-1312-4d1a-afb3-55aad56aba67
 # ╠═ee2e3d4a-44c4-4d5e-a2cc-099ca1de4b48
 # ╠═8818c1c7-0a14-4542-b620-187737e9cd74
@@ -862,5 +999,12 @@ version = "3.5.0+0"
 # ╠═719e97fc-76cf-47a4-b450-7185569badfd
 # ╠═857f21fb-6bce-4e1c-be29-068ca5a753c2
 # ╠═220b7b8d-eb32-44c7-944e-2ba08e19b3f1
+# ╟─9260ce2e-e6ca-43e9-81ed-97c9ed81362d
+# ╠═a34a9fd9-d2fc-4f49-a206-8ff528149b54
+# ╠═1a012336-20be-4be5-8952-b5ada343be48
+# ╠═52a08dfc-dff1-4d21-82ce-cbd3363202de
+# ╠═d18897f6-1766-40c0-a78f-335eb38119e0
+# ╠═71a7e160-f4e3-466f-8870-efc01b442482
+# ╠═5abfee99-14a9-49aa-82b1-6bacda8932b2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

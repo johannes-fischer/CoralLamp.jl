@@ -111,7 +111,7 @@ R2_1, R3_1
 # ╔═╡ 67a883b9-146d-4215-b4cb-d572a90d7a64
 begin
 	md"""
-	R $(@bind R Slider(1.5r1:3r1, default=2r1))
+	R $(@bind R Slider(0:3r1, default=2r1))
 	
 	α $(@bind α Slider(0.01:0.01:1, default=0.35))
 	
@@ -154,15 +154,15 @@ R, α, l, h1, h2
 		arc(side, 0, r1, -pi/2, pi/2)
 		strokepath()
 	
-		circle(0, -tip, r1, :stroke)
-		# circle(p1, 3, :fill)
-		# circle(p2, 3, :fill)
-		# circle(p3, 3, :fill)
-		# circle(p4, 3, :fill)
-		# circle(q1, 3, :fill)
-		# circle(q2, 3, :fill)
-		# circle(q3, 3, :fill)
-		# circle(q4, 3, :fill)
+		circle(0, -tip, r1/2, :stroke)
+		circle(p1, 3, :fill)
+		circle(p2, 3, :fill)
+		circle(p3, 3, :fill)
+		circle(p4, 3, :fill)
+		circle(q1, 3, :fill)
+		circle(q2, 3, :fill)
+		circle(q3, 3, :fill)
+		circle(q4, 3, :fill)
 	end
 	
 	@layer let
@@ -182,8 +182,8 @@ R, α, l, h1, h2
 		
 		arc(0, -tip, R, -pi-α, α)
 	
-		q1 = Point(0, -tip) + R * Point(cos(α), sin(α))
-		q2 = q1 + g1 * Point(-sin(α),cos(α))
+		q1 = Point(0, -tip) + polar(R, α)
+		q2 = q1 + polar(g1, α+pi/2)
 		q4 = Point(r1, -tip + l)
 		q3 = q4 + g2 * Point(0, -1)
 		curve(q2, q3, q4)
@@ -192,15 +192,15 @@ R, α, l, h1, h2
 		arc(side, 0, r1, -pi/2, pi/2)
 		strokepath()
 	
-		circle(0, -tip, r1, :stroke)
-		# circle(p1, 3, :fill)
-		# circle(p2, 3, :fill)
-		# circle(p3, 3, :fill)
-		# circle(p4, 3, :fill)
-		# circle(q1, 3, :fill)
-		# circle(q2, 3, :fill)
-		# circle(q3, 3, :fill)
-		# circle(q4, 3, :fill)
+		circle(0, -tip, r1/2, :stroke)
+		circle(p1, 3, :fill)
+		circle(p2, 3, :fill)
+		circle(p3, 3, :fill)
+		circle(p4, 3, :fill)
+		circle(q1, 3, :fill)
+		circle(q2, 3, :fill)
+		circle(q3, 3, :fill)
+		circle(q4, 3, :fill)
 	end
 	
 end 800 500
