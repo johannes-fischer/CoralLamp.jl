@@ -62,17 +62,27 @@ struct Ellipse
 end
 
 function project(c::SphereCircle, tangent::Plane)
-    # A sphere circle is projected as an ellipse 
+    # A sphere circle is projected as an ellipse
     # to the tangent plane in one of the circle's points A
     # The projected ellipse has a co-vertex at the point A
     proj = projectonto(c.center, tangent)
     Ellipse(c.r, norm(proj - tangent.distance * tangent.normal))
 end
 
-# struct CircleSegment
-#     r::Float64
-#     # r::Float64 # signed radius (sign determines clockwise or counterclockwise)
-#     rad::Float64 # segment angle in radians
-#     CircleSegment(r, rad) = (@assert r >= 0; new(r, rad))
-# end
-# # CircleSegment(r::Float64, rad::Float64) = CircleSegment(sign(r), abs(r), rad)
+function head_piece_smoothing_points(tip_pt::Point, α_head, l_head, r, R)
+    # see Pluto notebooks
+
+    # Distances of Bezier handles in curve direction to intersect
+    h1 = R / tan(α_head) - r / sin(α_head)
+    h2 = l_head - R / sin(α_head) + r / tan(α_head)
+
+    mirror_x(p::Point) = Point(-p.x, p.y)
+
+    q1 = tip_pt + polar(R, α_head)
+    q2 = q1 + polar(h1, α_head + pi / 2)
+    q4 = tip_pt + Point(r, l_head)
+    q3 = q4 + h2 * Point(0, -1)
+    right_pts = [q1, q2, q3, q4]
+    left_pts = mirror_x.(right_pts)
+    right_pts, left_pts
+end
