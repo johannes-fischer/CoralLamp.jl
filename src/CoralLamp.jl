@@ -16,8 +16,8 @@ using CSV
 using DataFrames
 using Statistics
 
-export 
-    svg,
+export
+    draw,
     Coral2d,
     Coral3d,
     Floral2d,

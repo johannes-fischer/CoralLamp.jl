@@ -53,7 +53,7 @@ function Base.show(io::IO, c::Coral2d)
     println(io, rad2deg(c.rad_bottom))
 end
 
-function svg(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
+function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
     head_diameter=nothing, head_hole_diameter=hole_diameter, test_holes=false,
     draw_skeleton=false, filename="coral.svg")
     Drawing("A4", filename)

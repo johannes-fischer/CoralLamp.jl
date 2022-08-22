@@ -69,12 +69,13 @@ function project(c::SphereCircle, tangent::Plane)
     Ellipse(c.r, norm(proj - tangent.distance * tangent.normal))
 end
 
-function head_piece_smoothing_points(tip_pt::Point, α_head, l_head, r, R)
+function head_piece_smoothing_points(tip_pt::Point, α_head, l_head, r, R, h2_factor=1.0)
     # see Pluto notebooks
 
     # Distances of Bezier handles in curve direction to intersect
     h1 = R / tan(α_head) - r / sin(α_head)
     h2 = l_head - R / sin(α_head) + r / tan(α_head)
+    h2 *= h2_factor
 
     mirror_x(p::Point) = Point(-p.x, p.y)
 

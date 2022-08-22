@@ -8,8 +8,8 @@ struct Floral3d
     radius::Float64
 end
 
-function Floral3d(data::PolyhedraTile, radius::Float64, stem_factor::Float64=1.0)
-    stem = stem_factor * radius / 15  # length 2cm looked good for 60cm diameter -> divide radius by 15
+function Floral3d(data::PolyhedraTile, radius::Float64)
+    stem = radius / 12  # length 2.5cm looked good for 60cm diameter -> divide radius by 12
     stem_angle = stem / radius
     axis = cross(data.tip, data.bottom_a + data.bottom_b)  # rotation axis as cross product of tip and center between two bottom (will be normalized)
     rot = AngleAxis(stem_angle, axis...)
@@ -75,11 +75,12 @@ end
 # strokepath()
 
 
-function svg(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
+function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
     head_diameter=nothing, head_hole_diameter=hole_diameter,
     draw_skeleton=false, filename="floral.svg")
     Drawing("A4", filename)
     origin()
+    
     (; stem, outer_r, inner_r, outer_rad, inner_rad) = f
     translate(0, -3stem)
 
@@ -143,7 +144,7 @@ function svg(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
         # Parameters for head piece
         α_head = 0.4
         l_head = stem
-        right_pts, left_pts = head_piece_smoothing_points(tip_pt, α_head, l_head, halfwidth, head_diameter / 2)
+        right_pts, left_pts = head_piece_smoothing_points(tip_pt, α_head, l_head, halfwidth, head_diameter / 2, 0.25)
 
         head_radius = head_diameter / 2
         head_angle = α_head
