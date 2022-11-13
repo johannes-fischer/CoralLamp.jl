@@ -25,7 +25,7 @@ draw_a4(coral, width,
     bridge=bridge,
     hole_diameter=hole_diameter,
     test_holes=draw_test_holes,
-    filename="coral_a4.$format")
+    filename="coral.$format")
 
 draw_a4(coral, width,
     bridge=bridge,
@@ -35,4 +35,4 @@ draw_a4(coral, width,
     α_head=α_head,
     l_head=l_head,
     test_holes=draw_test_holes,
-    filename="coral_head_a4.$format")
+    filename="coral_head.$format")

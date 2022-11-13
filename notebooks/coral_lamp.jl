@@ -68,10 +68,9 @@ head_diameter, α_head, l_head
 
 # ╔═╡ 58579588-1b0c-43db-b786-fdb677c14f6c
 let
-	w = 600
-	h = 450
 	@draw begin
-		origin(w/2, h)
+		origin()
+		translate(0, 200)
 		draw(coral, width, 
 			bridge=bridge, 
 			hole_diameter=hole_diameter, 
@@ -81,7 +80,7 @@ let
 			l_head=l_head,
 			test_holes=draw_test_holes
 		) 
-	end w h
+	end 600 450
 end
 
 # ╔═╡ af6107a2-066e-4754-aff0-e31fed9a691d
