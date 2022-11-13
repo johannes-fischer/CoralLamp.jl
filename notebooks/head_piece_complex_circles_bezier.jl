@@ -17,6 +17,9 @@ end
 # ╔═╡ b1e4f2a0-1cd4-11ed-22ed-9dd361a08ccf
 using Luxor, PlutoUI
 
+# ╔═╡ 70397633-31c8-4224-8066-4c276a1b7b95
+md"# Komplex Circles"
+
 # ╔═╡ b7b77f51-65bd-4ea0-b781-8e53993403a1
 begin
 	r1 = 30
@@ -107,6 +110,9 @@ end 800 500
 
 # ╔═╡ e148906d-26ce-41d9-bb74-d8a9a77ed147
 R2_1, R3_1
+
+# ╔═╡ 28677e6c-54e7-4eab-afa8-777da8599ad4
+md"# Bezier curves"
 
 # ╔═╡ 67a883b9-146d-4215-b4cb-d572a90d7a64
 begin
@@ -226,7 +232,7 @@ PlutoUI = "~0.7.39"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.0"
+julia_version = "1.8.2"
 manifest_format = "2.0"
 project_hash = "7fc984c985116994b1cb891e1cfc48096b79ad5c"
 
@@ -303,10 +309,10 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.1"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "ccd479984c7838684b3ac204b716c89955c76623"
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "74faea50c1d007c85837327f6775bea60b5492dd"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "4.4.2+0"
+version = "4.4.2+2"
 
 [[deps.FileIO]]
 deps = ["Pkg", "Requires", "UUIDs"]
@@ -589,6 +595,11 @@ git-tree-sha1 = "51a08fb14ec28da2ec7a927c4337e4332c2a4720"
 uuid = "91d4177d-7536-5919-b921-800302f37372"
 version = "1.3.2+0"
 
+[[deps.PCRE2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
+version = "10.40.0+0"
+
 [[deps.PCRE_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "b2a7af664e098055a7529ad1a900ded962bca488"
@@ -689,7 +700,7 @@ version = "1.0.0"
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
-version = "1.10.0"
+version = "1.10.1"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -843,6 +854,7 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
+# ╠═70397633-31c8-4224-8066-4c276a1b7b95
 # ╠═b1e4f2a0-1cd4-11ed-22ed-9dd361a08ccf
 # ╠═b7b77f51-65bd-4ea0-b781-8e53993403a1
 # ╠═a10f3473-8a2b-4237-bcf4-1ab64352ea6e
@@ -851,6 +863,7 @@ version = "3.5.0+0"
 # ╠═e148906d-26ce-41d9-bb74-d8a9a77ed147
 # ╠═8952df02-8b8f-4044-adff-8e6beea68452
 # ╠═7c88a9a1-1c92-4993-86a8-63caca27e353
+# ╠═28677e6c-54e7-4eab-afa8-777da8599ad4
 # ╠═28b95848-a8dd-42f8-a3e6-a2bf41104d21
 # ╠═67a883b9-146d-4215-b4cb-d572a90d7a64
 # ╠═c9719505-a9d8-4129-acb3-a571efa737a9
