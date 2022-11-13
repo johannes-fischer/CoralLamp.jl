@@ -26,6 +26,7 @@ struct Floral2d
     inner_r::Float64
     inner_rad::Float64
 end
+Floral2d(data::PolyhedraTile, radius::Float64) = Floral2d(Floral3d(data::PolyhedraTile, radius::Float64))
 function Floral2d(f::Floral3d)
     stem = f.radius * angle(f.tip, f.center)
 
@@ -43,7 +44,7 @@ function Floral2d(f::Floral3d)
     for pt in [f.side_a, f.side_b, f.bottom_a, f.bottom_b]
         circle_plane = Plane(f.center, f.center + tangent_line.dir, pt)
         circle = intersection(sphere, circle_plane)
-        println(circle)
+
         e = project(circle, tangent_plane)
         # The radius of curvature at the co-vertices of an ellipse is given by a^2/b
         # https://en.wikipedia.org/wiki/Ellipse#Curvature
@@ -67,20 +68,19 @@ function Floral2d(f::Floral3d)
 end
 
 
-
-# For corner circles in floral
-# https://juliagraphics.github.io/Luxor.jl/stable/simplegraphics/#Circles-and-tangents
-# line intersections https://juliagraphics.github.io/Luxor.jl/stable/geometrytools/#Intersections
-
-# strokepath()
-
+function draw_a4(f::Floral2d, args...; filename="floral.svg", kwargs...)
+    d = Drawing("A4", filename)
+    origin()
+    draw(f, args...; kwargs...)
+    finish()
+    d
+end
 
 function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
     head_diameter=nothing, head_hole_diameter=hole_diameter,
-    draw_skeleton=false, filename="floral.svg")
-    Drawing("A4", filename)
-    origin()
-    
+    α_head = 0.4, l_head = 1.0, h2_factor = 0.25,
+    draw_skeleton=false)
+
     (; stem, outer_r, inner_r, outer_rad, inner_rad) = f
     translate(0, -3stem)
 
@@ -88,7 +88,7 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
 
     tip_pt = Point(0, -stem)
 
-    bridge_a(r) = 0.5bridge / r
+    bridge_angle(r) = 0.5bridge / r
     r_hole = hole_diameter / 2
 
     if isnothing(r1)
@@ -129,7 +129,7 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
         d_hole = i == 1 ? head_hole_diameter : hole_diameter
         r_hole = d_hole / 2
         if bridge > 0
-            arc(p, r_hole, bridge_a(r_hole), 2pi - bridge_a(r_hole))
+            arc(p, r_hole, bridge_angle(r_hole), 2pi - bridge_angle(r_hole))
             newsubpath()
         else
             circle(p, r_hole, :stroke)
@@ -141,17 +141,16 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
         head_radius = halfwidth
         head_angle = 0
     else
-        # Parameters for head piece
-        α_head = 0.4
-        l_head = stem
-        right_pts, left_pts = head_piece_smoothing_points(tip_pt, α_head, l_head, halfwidth, head_diameter / 2, 0.25)
-
+        # Points for head piece
+        l_head *= stem # scale factor to actual size
+        right_pts, left_pts = head_piece_smoothing_points(tip_pt, α_head, l_head, halfwidth, head_diameter / 2, h2_factor)
+        # Adapt head parameters if head piece is drawn
         head_radius = head_diameter / 2
         head_angle = α_head
     end
 
     # RIGHT HALF OF STEM
-    arc(tip_pt, head_radius, -pi / 2 + bridge_a(head_radius), head_angle)
+    arc(tip_pt, head_radius, -pi / 2 + bridge_angle(head_radius), head_angle)
 
     if !isnothing(head_diameter)
         curve(right_pts[2:4]...)
@@ -161,16 +160,16 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
     carc2r(f1.center, start, f1.leaf)
 
     # OUTER RIGHT TIP
-    drawsegmentcap(f1, halfwidth, bridge_a(halfwidth))
+    drawsegmentcap(f1, halfwidth, bridge_angle(halfwidth))
     cornersmooth(f1, f2, halfwidth + r1)
     # INNER RIGHT TIP
-    drawsegmentcap(f2, halfwidth, bridge_a(halfwidth))
+    drawsegmentcap(f2, halfwidth, bridge_angle(halfwidth))
     cornersmooth(f2, f3, halfwidth + r2)
     # INNER LEFT TIP
-    drawsegmentcap(f3, halfwidth, bridge_a(halfwidth))
+    drawsegmentcap(f3, halfwidth, bridge_angle(halfwidth))
     cornersmooth(f3, f4, halfwidth + r1)
     # OUTER LEFT TIP
-    drawsegmentcap(f4, halfwidth, bridge_a(halfwidth))
+    drawsegmentcap(f4, halfwidth, bridge_angle(halfwidth))
 
     carc2r(f4.center, currentpoint(), O)
 
@@ -181,14 +180,12 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
     end
 
     # LEFT HALF OF STEM
-    arc(tip_pt, head_radius, -pi - head_angle, -pi / 2 - bridge_a(head_radius))
+    arc(tip_pt, head_radius, -pi - head_angle, -pi / 2 - bridge_angle(head_radius))
 
     if bridge == 0
         closepath()
     end
     strokepath()
-
-    finish()
 end
 
 struct FloralLeaf
