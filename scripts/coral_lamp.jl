@@ -24,7 +24,6 @@ format = "svg"
 draw_a4(coral, width,
     bridge=bridge,
     hole_diameter=hole_diameter,
-    head_diameter=nothing,
     test_holes=draw_test_holes,
     filename="coral_a4.$format")
 

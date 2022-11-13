@@ -54,10 +54,10 @@ function Base.show(io::IO, c::Coral2d)
     println(io, rad2deg(c.rad_bottom))
 end
 
-function draw_a4(args...; filename="coral.svg", kwargs...)
+function draw_a4(c::Coral2d, args...; filename="coral.svg", kwargs...)
     d = Drawing("A4", filename)
     origin()
-    draw(args...; kwargs...)
+    draw(c, args...; kwargs...)
     finish()
     d
 end
@@ -80,9 +80,6 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
         r2 = r1 / 2 * 0.95
     end
     r_corner = [r1, r2, r2, r2, r1]
-
-    # sethue("black")
-    # setline(1)
 
     lengths = [tip, side, bottom, bottom, side]
     angles = IntegralArray([-pi / 2, c.rad_tip_side, c.rad_side_bottom, c.rad_bottom, c.rad_side_bottom])

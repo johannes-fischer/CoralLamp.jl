@@ -41,7 +41,7 @@ begin
 	bridge = 0mm
 	hole_diameter = 5.5mm
 	head_hole_diameter = 9.6mm
-	#head_diameter = head_hole_diameter + 1.2width
+	default_head_diameter = head_hole_diameter + width
 
 	draw_test_holes = true
 	
@@ -53,7 +53,6 @@ end
 
 # ╔═╡ 77a8b185-5161-45bf-aa2e-4b6824da1e79
 begin
-	default_head_diameter = head_hole_diameter + width
 	md"""Head parameters 
 	
 	diameter: $(@bind head_diameter Slider(width:0.01:2*width, default=default_head_diameter))
@@ -90,7 +89,6 @@ begin
 	draw_a4(coral, width, 
 		bridge=bridge, 
 		hole_diameter=hole_diameter, 
-		head_diameter=nothing, 
 		test_holes=draw_test_holes,
 		filename="coral.$format")
 	nothing
