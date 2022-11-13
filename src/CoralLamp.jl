@@ -18,6 +18,7 @@ using Statistics
 
 export
     draw,
+    draw_a4,
     Coral2d,
     Coral3d,
     Floral2d,

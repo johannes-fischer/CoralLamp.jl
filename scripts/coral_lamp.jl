@@ -1,21 +1,39 @@
 using Luxor
 using CoralLamp
 
-
 t = get_tile()
-
 diameter = 60cm
-radius = diameter / 2
 
-coral = Coral2d(Coral3d(t, radius))
+coral = Coral2d(t, diameter / 2)
+print(coral)
+
 width = diameter / 30
+
+bridge = 0mm
 hole_diameter = 5.5mm
 head_hole_diameter = 9.6mm
-head_diameter = head_hole_diameter + 1.2width
+head_diameter = head_hole_diameter + width
+α_head = 0.25
+l_head = 0.5
 
-print(coral)
+draw_test_holes = true
 
 format = "svg"
 # format = "pdf"
-draw(coral, width, bridge=0mm, hole_diameter=hole_diameter, test_holes=true, filename="coral.$format")
-draw(coral, width, bridge=0mm, hole_diameter=hole_diameter, head_diameter=head_diameter, head_hole_diameter=head_hole_diameter, test_holes=true, filename="coral_head.$format")
+
+draw_a4(coral, width,
+    bridge=bridge,
+    hole_diameter=hole_diameter,
+    head_diameter=nothing,
+    test_holes=draw_test_holes,
+    filename="coral_a4.$format")
+
+draw_a4(coral, width,
+    bridge=bridge,
+    hole_diameter=hole_diameter,
+    head_diameter=head_diameter,
+    head_hole_diameter=head_hole_diameter,
+    α_head=α_head,
+    l_head=l_head,
+    test_holes=draw_test_holes,
+    filename="coral_head_a4.$format")

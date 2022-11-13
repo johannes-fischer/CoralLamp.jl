@@ -15,7 +15,7 @@ function Coral3d(data::PolyhedraTile, radius::Float64)
     Coral3d(radius * normalize.(points)..., radius)
 end
 
-# angle at ball center between alle the tips of the shape and the star center
+# angle at ball center between all the tips of the shape and the star center
 function angledistances(c::Coral3d)
     angle_tip_center = angle(c.tip, c.center)
     angle_side_center = (angle(c.side_a, c.center) + angle(c.side_b, c.center)) / 2
@@ -42,6 +42,7 @@ struct Coral2d
     rad_bottom
 end
 Coral2d(c::Coral3d) = Coral2d(armlengths(c)..., angles(c)...)
+Coral2d(data::PolyhedraTile, radius::Float64) = Coral2d(Coral3d(data, radius))
 
 function Base.show(io::IO, c::Coral2d)
     println(io, "Coral2d:")
@@ -53,18 +54,24 @@ function Base.show(io::IO, c::Coral2d)
     println(io, rad2deg(c.rad_bottom))
 end
 
-function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
-    head_diameter=nothing, head_hole_diameter=hole_diameter, test_holes=false,
-    draw_skeleton=false, filename="coral.svg")
-    Drawing("A4", filename)
+function draw_a4(args...; filename="coral.svg", kwargs...)
+    d = Drawing("A4", filename)
     origin()
+    draw(args...; kwargs...)
+    finish()
+    d
+end
+
+function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
+    head_diameter=nothing, head_hole_diameter=hole_diameter, α_head=0.3, l_head=0.5,
+    test_holes=false, draw_skeleton=false)
 
     tip = c.length_tip
     side = c.length_side
     bottom = c.length_bottom
     halfwidth = width / 2
 
-    bridge_a(r) = 0.5bridge / r
+    bridge_angle(r) = 0.5bridge / r
 
     if isnothing(r1)
         r1 = side / 10 * 0.95
@@ -74,8 +81,8 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
     end
     r_corner = [r1, r2, r2, r2, r1]
 
-    sethue("black")
-    setline(1)
+    # sethue("black")
+    # setline(1)
 
     lengths = [tip, side, bottom, bottom, side]
     angles = IntegralArray([-pi / 2, c.rad_tip_side, c.rad_side_bottom, c.rad_bottom, c.rad_side_bottom])
@@ -96,7 +103,7 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
         d_hole = i == 1 ? head_hole_diameter : hole_diameter
         r_hole = d_hole / 2
         if bridge > 0
-            arc(p, r_hole, bridge_a(r_hole), 2pi - bridge_a(r_hole))
+            arc(p, r_hole, bridge_angle(r_hole), 2pi - bridge_angle(r_hole))
             newsubpath()
         else
             circle(p, r_hole, :stroke)
@@ -105,10 +112,9 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
 
     # Points for Bezier curve for smooth head piece
 
+    # Points for head piece
     if !isnothing(head_diameter)
-        # Parameters for head piece
-        α_head = 0.3
-        l_head = 1/2 * tip
+        l_head *= tip # scale factor to actual size
         right_pts, left_pts = head_piece_smoothing_points(first(skeleton), α_head, l_head, halfwidth, head_diameter / 2)
     end
 
@@ -127,7 +133,7 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
                 cap_angle = pi / 2 + α_head
             end
             rotate(slope(O, s1))
-            arc(distance(O, s1), 0, cap_radius, bridge_a(cap_radius), cap_angle)
+            arc(distance(O, s1), 0, cap_radius, bridge_angle(cap_radius), cap_angle)
         end
         if !isnothing(head_diameter) && i == 1
             curve(right_pts[2:4]...)
@@ -150,7 +156,7 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
                 cap_angle = -(pi / 2 + α_head)
             end
             rotate(slope(O, s2))
-            arc(distance(O, s2), 0, cap_radius, cap_angle, -bridge_a(cap_radius))
+            arc(distance(O, s2), 0, cap_radius, cap_angle, -bridge_angle(cap_radius))
         end
     end
 
@@ -160,13 +166,11 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
     strokepath()
 
     if test_holes
-        draw_test_holes(-side, bridge_a)
+        draw_test_holes(-side, bridge_angle)
     end
-
-    finish()
 end
 
-function draw_test_holes(offset, bridge_a)
+function draw_test_holes(offset, bridge_angle)
     space = 10mm
     diameter = 4.0mm
     n_rows = 4
@@ -175,7 +179,7 @@ function draw_test_holes(offset, bridge_a)
         p = Point(offset + i * space, -(j + 1) * space)
         radius = diameter / 2
         newpath()
-        arc(p, radius, i / 2 * bridge_a(radius), 2pi, :stroke)
+        arc(p, radius, i / 2 * bridge_angle(radius), 2pi, :stroke)
         diameter += 0.1mm
     end
 end
