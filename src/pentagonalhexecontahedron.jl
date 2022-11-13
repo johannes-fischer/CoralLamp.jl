@@ -7,10 +7,9 @@ struct PolyhedraTile
     bottom_b
 end
 
-function read_vertices()
+function read_vertices(filename="data/pentagonalhexecontahedron.csv")
     # Pentagonal hexecontahedron
     # vertices do not lie on a sphere! Long tips have slightly larger radius
-    filename = "data/pentagonalhexecontahedron.csv"
     df = CSV.read(filename, DataFrame, header=false)
     vertices = [Vector(row) for row in eachrow(df)]
 end
@@ -21,8 +20,8 @@ function get_tile()
     get_tip_tiles(vertices, tip)[1]
 end
 
-function get_tiles()
-    vertices = read_vertices()
+function get_tiles(filename="data/pentagonalhexecontahedron.csv")
+    vertices = read_vertices(filename)
     tips = find_tips(vertices)
     vcat(map(j_tip->get_tip_tiles(vertices, j_tip), tips)...)
 end
@@ -56,15 +55,7 @@ function get_tip_tiles(vertices, j_tip)
 end
 
 function get_pentagon(vertices, j_tip)
-    sorted = sort(1:length(vertices), by=i->euclidean(vertices[i], vertices[j_tip]))
+    sorted = sort(1:length(vertices), by=i -> euclidean(vertices[i], vertices[j_tip]))
     # First entry is the tip j itself
     sorted[2:6]
 end
-
-# ### TEST if all tiles are equal or not
-# tiles = get_tiles()
-# corals = [Coral2d(Coral3d(t, 30.)) for t in tiles]
-# r = hcat(map(c->[getfield(c,i) for i in 1:6], corals)...)
-# using Statistics
-# @show mean(r, dims=2)
-# @show std(r, dims=2)
