@@ -62,9 +62,9 @@ function draw_a4(c::Coral2d, args...; filename="coral.svg", kwargs...)
     d
 end
 
-function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
+function draw(c::Coral2d, width; hole_diameter=nothing, r1=nothing, r2=nothing, bridge=0mm,
     head_diameter=nothing, head_hole_diameter=hole_diameter, α_head=0.3, l_head=0.5,
-    test_holes=false, draw_skeleton=false)
+    test_holes=false, draw_skeleton=false, stroke=true)
 
     tip = c.length_tip
     side = c.length_side
@@ -86,24 +86,34 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
 
     skeleton = [polar(l, a) for (l, a) in zip(lengths, angles)]
 
+    newpath()
+
+    if test_holes
+        draw_test_holes(-side, bridge_angle)
+    end
+
     # draw skeleton
     if draw_skeleton
         @layer begin
             sethue("red")
             for p in skeleton
-                line(O, p, :stroke)
+                line(O, p, :path)
+                newsubpath()
             end
         end
     end
 
-    for (i, p) in enumerate(skeleton)
-        d_hole = i == 1 ? head_hole_diameter : hole_diameter
-        r_hole = d_hole / 2
-        if bridge > 0
-            arc(p, r_hole, bridge_angle(r_hole), 2pi - bridge_angle(r_hole))
-            newsubpath()
-        else
-            circle(p, r_hole, :stroke)
+    if !isnothing(hole_diameter)
+        for (i, p) in enumerate(skeleton)
+            d_hole = i == 1 ? head_hole_diameter : hole_diameter
+            r_hole = d_hole / 2
+            if bridge > 0
+                arc(p, r_hole, bridge_angle(r_hole), 2pi - bridge_angle(r_hole))
+                newsubpath()
+            else
+                circle(p, r_hole, :path)
+                newsubpath()
+            end
         end
     end
 
@@ -160,23 +170,23 @@ function draw(c::Coral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1
     if bridge == 0
         closepath()
     end
-    strokepath()
+    p = storepath()
+    b = BoundingBox(p)
+    stroke && strokepath()
 
-    if test_holes
-        draw_test_holes(-side, bridge_angle)
-    end
+    return b
 end
 
 function draw_test_holes(offset, bridge_angle)
     space = 10mm
     diameter = 4.0mm
-    n_rows = 4
+    n_rows = 6
     n_cols = 5
     for j in 1:n_rows, i in 1:n_cols
         p = Point(offset + i * space, -(j + 1) * space)
         radius = diameter / 2
-        newpath()
-        arc(p, radius, i / 2 * bridge_angle(radius), 2pi, :stroke)
+        arc(p, radius, i / 2 * bridge_angle(radius), 2pi, :path)
+        newsubpath()
         diameter += 0.1mm
     end
 end
