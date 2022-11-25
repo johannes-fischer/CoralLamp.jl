@@ -84,7 +84,7 @@ let
 			l_head=l_head,
 			test_holes=draw_test_holes
 		) 
-	end 600 450
+	end 600 900
 end
 
 # ╔═╡ af6107a2-066e-4754-aff0-e31fed9a691d

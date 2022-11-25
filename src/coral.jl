@@ -189,4 +189,17 @@ function draw_test_holes(offset, bridge_angle)
         newsubpath()
         diameter += 0.1mm
     end
+
+
+    space = 20mm
+    diameter = 9.3mm
+    n_rows = 3
+    n_cols = 2
+    for j in 1:n_rows, i in 1:(n_rows-j+1)
+        p = Point(offset + (i-1) * space, (j + 0.2) * space)
+        radius = diameter / 2
+        arc(p, radius, j / 2 * bridge_angle(radius), 2pi, :path)
+        newsubpath()
+        diameter += 0.1mm
+    end
 end
