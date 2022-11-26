@@ -133,7 +133,9 @@ end
 
 # ╔═╡ 88342e3d-9570-4543-9db5-0d8d1eaa5046
 begin
-	bb = draw(coral, width, stroke=false)
+	coral_path = construct_path(coral, width, 
+		bridge=bridge, hole_diameter=hole_diameter)
+	bb = BoundingBox(coral_path)
 	newpath()
 	rotated_bb = BoundingBox(mirror_y.(bb))
 	bb, rotated_bb
@@ -182,22 +184,15 @@ begin
 			@layer for _ in 1:ncols
 				@layer begin
 					rotate(π)
-					b = draw(coral, width, 
-						bridge=bridge, 
-						hole_diameter=hole_diameter,
-						stroke=!draw_only_complete
-					)
-					draw_only_complete && isinside(getworldposition(centered=false), rotated_bb, drawing_bb) && strokepath()
+					if !draw_only_complete || isinside(getworldposition(centered=false), rotated_bb, drawing_bb)
+						drawpath(coral_path, action=:stroke)
+					end
 				end
 				@layer begin
 					translate(pair_offset)
-					b=draw(coral, width, 
-						bridge=bridge, 
-						hole_diameter=hole_diameter,
-						stroke=!draw_only_complete
-					)
-					draw_only_complete && isinside(getworldposition(centered=false), bb, drawing_bb) && strokepath()
-				
+					if !draw_only_complete || isinside(getworldposition(centered=false), bb, drawing_bb)
+						drawpath(coral_path, action=:stroke)
+					end
 				end
 				translate(horizontal_offset)
 			end

@@ -62,9 +62,14 @@ function draw_a4(c::Coral2d, args...; filename="coral.svg", kwargs...)
     d
 end
 
-function draw(c::Coral2d, width; hole_diameter=nothing, r1=nothing, r2=nothing, bridge=0mm,
+function draw(c::Coral2d, args...; kwargs...)
+    p = construct_path(c, args...; kwargs...)
+    drawpath(p, action=:stroke)
+end
+
+function construct_path(c::Coral2d, width; hole_diameter=nothing, r1=nothing, r2=nothing, bridge=0mm,
     head_diameter=nothing, head_hole_diameter=hole_diameter, α_head=0.3, l_head=0.5,
-    test_holes=false, draw_skeleton=false, stroke=true)
+    test_holes=false, draw_skeleton=false)
 
     tip = c.length_tip
     side = c.length_side
@@ -171,10 +176,7 @@ function draw(c::Coral2d, width; hole_diameter=nothing, r1=nothing, r2=nothing, 
         closepath()
     end
     p = storepath()
-    b = BoundingBox(p)
-    stroke && strokepath()
-
-    return b
+    return p
 end
 
 function draw_test_holes(offset, bridge_angle)

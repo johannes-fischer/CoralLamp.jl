@@ -17,6 +17,7 @@ using DataFrames
 using Statistics
 
 export
+    construct_path,
     draw,
     draw_a4,
     Coral2d,
