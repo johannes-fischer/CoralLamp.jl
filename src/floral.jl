@@ -27,6 +27,7 @@ struct Floral2d
     inner_rad::Float64
 end
 Floral2d(data::PolyhedraTile, radius::Float64) = Floral2d(Floral3d(data::PolyhedraTile, radius::Float64))
+
 function Floral2d(f::Floral3d)
     stem = f.radius * angle(f.tip, f.center)
 
@@ -76,7 +77,12 @@ function draw_a4(f::Floral2d, args...; filename="floral.svg", kwargs...)
     d
 end
 
-function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=1mm,
+function draw(f::Floral2d, args...; kwargs...)
+    p = construct_path(f, args...; kwargs...)
+    drawpath(p, action=:stroke)
+end
+
+function construct_path(f::Floral2d, width; hole_diameter=nothing, r1=nothing, r2=nothing, bridge=0mm,
     head_diameter=nothing, head_hole_diameter=hole_diameter,
     α_head = 0.4, l_head = 1.0, h2_factor = 0.25,
     draw_skeleton=false)
@@ -89,7 +95,6 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
     tip_pt = Point(0, -stem)
 
     bridge_angle(r) = 0.5bridge / r
-    r_hole = hole_diameter / 2
 
     if isnothing(r1)
         r1 = halfwidth / 2.5
@@ -108,16 +113,20 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
     ]
     segments = [FloralLeaf(c, c + p) for (c, p) in segments_]
 
+    newpath()
+
     if draw_skeleton
         # draw skeleton
         @layer begin
             sethue("red")
-            line(O, tip_pt, :stroke)
+            line(O, tip_pt, :path)
+            newsubpath()
             for f in segments
                 c = f.center
                 p = f.leaf
                 args = (c, O, p)
-                isarcclockwise(O, -c, p - c) ? arc2r(args..., :stroke) : carc2r(args..., :stroke)
+                isarcclockwise(O, -c, p - c) ? arc2r(args...) : carc2r(args...)
+                newsubpath()
             end
         end
     end
@@ -125,14 +134,17 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
     holes = [f.leaf for f in segments]
     pushfirst!(holes, tip_pt)
 
-    for (i, p) in enumerate(holes)
-        d_hole = i == 1 ? head_hole_diameter : hole_diameter
-        r_hole = d_hole / 2
-        if bridge > 0
-            arc(p, r_hole, bridge_angle(r_hole), 2pi - bridge_angle(r_hole))
-            newsubpath()
-        else
-            circle(p, r_hole, :stroke)
+    if !isnothing(hole_diameter)
+        for (i, p) in enumerate(holes)
+            d_hole = i == 1 ? head_hole_diameter : hole_diameter
+            r_hole = d_hole / 2
+            if bridge > 0
+                arc(p, r_hole, bridge_angle(r_hole), 2pi - bridge_angle(r_hole))
+                newsubpath()
+            else
+                circle(p, r_hole, :path)
+                newsubpath()
+            end
         end
     end
 
@@ -185,7 +197,8 @@ function draw(f::Floral2d, width; hole_diameter, r1=nothing, r2=nothing, bridge=
     if bridge == 0
         closepath()
     end
-    strokepath()
+    p = storepath()
+    return p
 end
 
 struct FloralLeaf

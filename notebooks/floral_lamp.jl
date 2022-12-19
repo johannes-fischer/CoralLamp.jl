@@ -17,10 +17,14 @@ end
 # ╔═╡ 82be8732-6349-11ed-0ff2-074be5a7d82d
 let
 	using Pkg
+	using Revise
 	Pkg.activate(Base.current_project())
 	cd(joinpath(splitpath(Base.current_project())[1:end-1]))
 	using CoralLamp, Luxor, PlutoUI, Revise
 end
+
+# ╔═╡ 4853143c-35af-4d07-81e1-ca870e7c163a
+md"# Floral"
 
 # ╔═╡ 2f608630-b542-44d8-b913-3ca808b2a5a2
 md"Diameter: $(@bind diameter_cm Slider(1:1:100, default=60))
@@ -115,7 +119,127 @@ begin
 	nothing
 end
 
+# ╔═╡ 242f268d-6c05-4c6b-bc45-ee50a7911750
+md"## Tiling"
+
+# ╔═╡ 523f7e5c-6375-42eb-9aeb-f3f88ea6cb8d
+#canvas_width, canvas_height = 1220mm, 2440mm
+canvas_width, canvas_height = 610mm, 610mm
+#canvas_width, canvas_height = 640mm, 610mm
+#canvas_width, canvas_height = 970mm, 610mm
+
+# ╔═╡ f5a5cd97-2b3f-4229-bc5a-8bc335e6ae6f
+begin
+	d = 0.1 * width
+	length = floral.stem + floral.inner_r * sin(floral.inner_rad)
+	side = floral.outer_r * (1-cos(floral.outer_rad))
+	width, d, length, side
+end
+
+# ╔═╡ cffded6d-c8dc-43ae-8a2b-e52b525e906f
+mirror_y(p) = Point(p.x, -p.y)
+
+# ╔═╡ 4f34b349-5de3-48f8-846f-dbfae2197152
+function Luxor.isinside(shape_center::Point, shape_bb::BoundingBox, drawing_bb::BoundingBox)
+	shifted_bb = shape_center .+ shape_bb
+	all(isinside.(shifted_bb, (drawing_bb,)))
+end
+
+# ╔═╡ be11b677-cbc6-4654-949b-285987f78621
+begin
+	floral_path = construct_path(floral, width, 
+		bridge=bridge, hole_diameter=hole_diameter)
+	bb = BoundingBox(floral_path)
+	newpath()
+	rotated_bb = BoundingBox(mirror_y.(bb))
+	bb, rotated_bb
+end
+
+# ╔═╡ 036fccf7-951e-4b1c-bee5-25058e207768
+# only draw shapes that are fully contained in drawing
+draw_only_complete = false
+
+# ╔═╡ f8fcd667-2231-4090-8b78-de71f8008d48
+md"""
+pair offset x $(@bind pair_offset_x Slider(1:0.01:2, default=1.36, show_value=true))
+
+pair offset y $(@bind pair_offset_y Slider(0:0.01:2, default=0.65, show_value=true))
+
+vertical offset $(@bind vert_offset Slider(0:0.01:1, default=0.77, show_value=true))
+"""
+
+# ╔═╡ adf967ff-7856-4317-a162-168c4e67b84d
+begin
+	layout1 = 1
+	name = "floral_tiling_v$layout1.svg"
+	n_tiles = 0
+	@svg begin
+		nrows = 2
+		ncols = 2
+		
+		# In large drawings, additional rows/cols can be added to also reach the top right and bottom left corners, since the area filled with shapes is a parallelogram
+		offset_rows = 0
+		offset_cols = 0
+	
+		if layout1 == 1
+			x_offset = 1.36 * side
+			initial_offset = Point(d + width/2 + side, 0.92*length + d)
+			horizontal_offset = Point(2x_offset+2d, 0)
+			vertical_offset = Point(0, 0.77*length+2d)
+			pair_offset = Point(x_offset + d, -0.65*length - d)
+		elseif layout1 == 2
+			x_offset = 1.46 * side
+			initial_offset = Point(d + width/2 + side, 0.92*length + d)
+			horizontal_offset = Point(2x_offset + 2d, 0)
+			vertical_offset = Point(0, 0.77*length+2d)
+			pair_offset = Point(x_offset + d, -1.02*length - d)
+		elseif layout1 == 3
+			#x_offset = 1.36 * side
+			#initial_offset = Point(d + width/2 + side, 0.92*length + d)
+			#horizontal_offset = Point(2x_offset+2d, 0)
+			#vertical_offset = Point(0, 0.77*length+2d)
+			#pair_offset = Point(x_offset + d, -0.65*length - d)
+		end
+		
+		origin(O)
+		drawing_bb = BoundingBox(centered=false)
+		translate(initial_offset)
+	
+		for _ in 1:offset_rows
+			translate(-vertical_offset)
+		end
+		for _ in 1:offset_cols
+			translate(-horizontal_offset)
+		end
+		
+		for _ in 1:nrows
+			@layer for _ in 1:ncols
+				@layer begin
+					rotate(π)
+					if !draw_only_complete || isinside(getworldposition(centered=false), rotated_bb, drawing_bb)
+						drawpath(floral_path, action=:stroke)
+						n_tiles += 1
+					end
+				end
+				@layer begin
+					translate(pair_offset)
+					if !draw_only_complete || isinside(getworldposition(centered=false), bb, drawing_bb)
+						drawpath(floral_path, action=:stroke)
+						n_tiles += 1
+					end
+				end
+				translate(horizontal_offset)
+			end
+			translate(vertical_offset)
+		end
+	end canvas_width canvas_height name
+end
+
+# ╔═╡ f2462edc-37b4-4d92-9711-13078239c8db
+n_tiles
+
 # ╔═╡ Cell order:
+# ╟─4853143c-35af-4d07-81e1-ca870e7c163a
 # ╠═82be8732-6349-11ed-0ff2-074be5a7d82d
 # ╟─2f608630-b542-44d8-b913-3ca808b2a5a2
 # ╟─0dbb197a-f93e-4290-b1e7-b7980d404679
@@ -125,3 +249,13 @@ end
 # ╠═58579588-1b0c-43db-b786-fdb677c14f6c
 # ╠═af6107a2-066e-4754-aff0-e31fed9a691d
 # ╠═d276775c-abc7-4517-aeeb-ffa2641bd567
+# ╟─242f268d-6c05-4c6b-bc45-ee50a7911750
+# ╠═523f7e5c-6375-42eb-9aeb-f3f88ea6cb8d
+# ╠═f2462edc-37b4-4d92-9711-13078239c8db
+# ╠═f5a5cd97-2b3f-4229-bc5a-8bc335e6ae6f
+# ╠═cffded6d-c8dc-43ae-8a2b-e52b525e906f
+# ╠═4f34b349-5de3-48f8-846f-dbfae2197152
+# ╠═be11b677-cbc6-4654-949b-285987f78621
+# ╠═036fccf7-951e-4b1c-bee5-25058e207768
+# ╠═f8fcd667-2231-4090-8b78-de71f8008d48
+# ╠═adf967ff-7856-4317-a162-168c4e67b84d
