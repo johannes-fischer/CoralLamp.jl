@@ -84,7 +84,7 @@ let
 			l_head=l_head,
 			test_holes=draw_test_holes
 		) 
-	end 600 900
+	end 600 600
 end
 
 # ╔═╡ af6107a2-066e-4754-aff0-e31fed9a691d
@@ -113,6 +113,12 @@ end
 
 # ╔═╡ 276b5f43-b9c7-467f-8303-0c394a967492
 md"## Tiling"
+
+# ╔═╡ b9efa391-4c96-46e5-8e16-14f77c4312a5
+canvas_width, canvas_height = 1220mm, 2440mm
+#canvas_width, canvas_height = 610mm, 610mm
+#canvas_width, canvas_height = 640mm, 610mm
+#canvas_width, canvas_height = 970mm, 610mm
 
 # ╔═╡ 406e6898-42b5-4bdf-8f90-c1c95d98e3ac
 begin
@@ -147,26 +153,32 @@ draw_only_complete = true
 
 # ╔═╡ 8cbf6e97-1f43-49e3-8303-9edbc386cf6e
 begin
-	layout1 = false
-	name = "coral_tiling_$(layout1 ? "v1" : "v2").svg"
+	layout = 1
+	name = "coral_tiling_v$layout.svg"
+	n_tiles = 0
 	@svg begin
-		nrows = 10
+		nrows = 17
 		ncols = 13
 		
 		# In large drawings, additional rows/cols can be added to also reach the top right and bottom left corners, since the area filled with shapes is a parallelogram
 		offset_rows = 1
-		offset_cols = 0
+		offset_cols = 1
 	
-		if layout1
-			initial_offset = Point(width+d+side*1.15, side*1.05)
-			horizontal_offset = Point(side+2width+d, (width+d))
-			vertical_offset = Point(width, 2tip+width+2d)
-			pair_offset = Point(-(width+d), tip+width+d)
-		else
+		if layout == 1
+			initial_offset = Point(side*1.15, side*1.05)
+			horizontal_offset = Point(2*(side+width+d), 0)
+			vertical_offset = Point(0, 1.38 * tip)
+			pair_offset = Point((side+width+d), 0.4*(tip+width+d))
+		elseif layout == 2
 			initial_offset = Point(side*1.15, side*1.05)
 			horizontal_offset = Point(side+2width+2d, (width+d))
 			vertical_offset = Point(-3width-d, 2tip+2d)
 			pair_offset = Point((width+d), tip+width+d)
+		elseif layout == 3
+			initial_offset = Point(width+d+side*1.15, side*1.05)
+			horizontal_offset = Point(side+2width+d, (width+d))
+			vertical_offset = Point(width, 2tip+width+2d)
+			pair_offset = Point(-(width+d), tip+width+d)
 		end
 		
 		origin(O)
@@ -186,20 +198,25 @@ begin
 					rotate(π)
 					if !draw_only_complete || isinside(getworldposition(centered=false), rotated_bb, drawing_bb)
 						drawpath(coral_path, action=:stroke)
+						n_tiles += 1
 					end
 				end
 				@layer begin
 					translate(pair_offset)
 					if !draw_only_complete || isinside(getworldposition(centered=false), bb, drawing_bb)
 						drawpath(coral_path, action=:stroke)
+						n_tiles += 1
 					end
 				end
 				translate(horizontal_offset)
 			end
 			translate(vertical_offset)
 		end
-	end 1220mm 2440mm name
+	end canvas_width canvas_height name
 end
+
+# ╔═╡ 0320fdfc-90ae-40d3-b65f-f5d595646cd0
+n_tiles
 
 # ╔═╡ Cell order:
 # ╟─9eabb799-6156-4004-9a86-dcdc8b12b47d
@@ -213,6 +230,8 @@ end
 # ╠═af6107a2-066e-4754-aff0-e31fed9a691d
 # ╠═d276775c-abc7-4517-aeeb-ffa2641bd567
 # ╟─276b5f43-b9c7-467f-8303-0c394a967492
+# ╠═b9efa391-4c96-46e5-8e16-14f77c4312a5
+# ╠═0320fdfc-90ae-40d3-b65f-f5d595646cd0
 # ╠═406e6898-42b5-4bdf-8f90-c1c95d98e3ac
 # ╠═ffd596aa-70ae-4883-89a7-e6e2e53bca85
 # ╠═87e8f4b3-7c39-430f-a028-f0a5af417650

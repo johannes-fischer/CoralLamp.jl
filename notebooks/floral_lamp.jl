@@ -123,8 +123,8 @@ end
 md"## Tiling"
 
 # ╔═╡ 523f7e5c-6375-42eb-9aeb-f3f88ea6cb8d
-#canvas_width, canvas_height = 1220mm, 2440mm
-canvas_width, canvas_height = 610mm, 610mm
+canvas_width, canvas_height = 1220mm, 2440mm
+#canvas_width, canvas_height = 610mm, 610mm
 #canvas_width, canvas_height = 640mm, 610mm
 #canvas_width, canvas_height = 970mm, 610mm
 
@@ -157,48 +157,38 @@ end
 
 # ╔═╡ 036fccf7-951e-4b1c-bee5-25058e207768
 # only draw shapes that are fully contained in drawing
-draw_only_complete = false
-
-# ╔═╡ f8fcd667-2231-4090-8b78-de71f8008d48
-md"""
-pair offset x $(@bind pair_offset_x Slider(1:0.01:2, default=1.36, show_value=true))
-
-pair offset y $(@bind pair_offset_y Slider(0:0.01:2, default=0.65, show_value=true))
-
-vertical offset $(@bind vert_offset Slider(0:0.01:1, default=0.77, show_value=true))
-"""
+draw_only_complete = true
 
 # ╔═╡ adf967ff-7856-4317-a162-168c4e67b84d
 begin
-	layout1 = 1
-	name = "floral_tiling_v$layout1.svg"
+	layout = 1
+	name = "floral_tiling_v$layout.svg"
 	n_tiles = 0
 	@svg begin
-		nrows = 2
-		ncols = 2
+		nrows = 20
+		ncols = 14
 		
 		# In large drawings, additional rows/cols can be added to also reach the top right and bottom left corners, since the area filled with shapes is a parallelogram
-		offset_rows = 0
+		offset_rows = 1
 		offset_cols = 0
 	
-		if layout1 == 1
+		if layout == 1
 			x_offset = 1.36 * side
 			initial_offset = Point(d + width/2 + side, 0.92*length + d)
 			horizontal_offset = Point(2x_offset+2d, 0)
 			vertical_offset = Point(0, 0.77*length+2d)
 			pair_offset = Point(x_offset + d, -0.65*length - d)
-		elseif layout1 == 2
+		elseif layout == 2
 			x_offset = 1.46 * side
 			initial_offset = Point(d + width/2 + side, 0.92*length + d)
 			horizontal_offset = Point(2x_offset + 2d, 0)
 			vertical_offset = Point(0, 0.77*length+2d)
 			pair_offset = Point(x_offset + d, -1.02*length - d)
-		elseif layout1 == 3
-			#x_offset = 1.36 * side
-			#initial_offset = Point(d + width/2 + side, 0.92*length + d)
-			#horizontal_offset = Point(2x_offset+2d, 0)
-			#vertical_offset = Point(0, 0.77*length+2d)
-			#pair_offset = Point(x_offset + d, -0.65*length - d)
+		elseif layout == 3
+			initial_offset = Point(d + width/2 + side, 0.92*length + d)
+			pair_offset = Point(0.39*side + d, -0.08*length + d)
+			horizontal_offset = Point(1.56*side + d, 0.18*length + d)
+			vertical_offset = pair_offset + Point(-side - d, 1.39*length + d)
 		end
 		
 		origin(O)
@@ -257,5 +247,4 @@ n_tiles
 # ╠═4f34b349-5de3-48f8-846f-dbfae2197152
 # ╠═be11b677-cbc6-4654-949b-285987f78621
 # ╠═036fccf7-951e-4b1c-bee5-25058e207768
-# ╠═f8fcd667-2231-4090-8b78-de71f8008d48
 # ╠═adf967ff-7856-4317-a162-168c4e67b84d
